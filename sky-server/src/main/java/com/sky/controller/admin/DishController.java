@@ -1,7 +1,9 @@
 package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import io.swagger.annotations.Api;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/admin/dish")
-@Api("菜品相关接口")
+@Api(tags ="菜品相关接口")
 @Slf4j
 public class DishController {
     @Autowired
@@ -31,5 +33,17 @@ public class DishController {
         log.info("新增菜品，菜品信息：{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
         return Result.success();
+    }
+
+    /**
+     * 菜品分页查询
+     * @param dishPageQueryDTO
+     * @return
+     */
+    @PostMapping("/page")
+    @ApiOperation("菜品分页查询")
+    public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
+        PageResult pageResult=dishService.pageQuery(dishPageQueryDTO);
+        return Result.success(pageResult);
     }
 }

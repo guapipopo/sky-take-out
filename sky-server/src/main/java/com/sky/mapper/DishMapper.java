@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper {
 
@@ -28,4 +30,8 @@ public interface DishMapper {
     void insert(Dish dish);
 
     Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+
+    int getStatusByIds(List<Long> ids);
+
+    void deleteBatch(List<Long> ids);
 }

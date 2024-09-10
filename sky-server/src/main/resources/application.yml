@@ -9,9 +9,13 @@ spring:
   datasource:
     druid:
       driver-class-name: ${sky.datasource.driver-class-name}
-      url: jdbc:mysql://localhost:3306/sky_take_out
-      username: root
-      password: lff654321
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}
+      username: ${sky.datasource.username}
+      password: ${sky.datasource.password}
+  redis:
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    database: ${sky.redis.database}
 
 mybatis:
   #mapper配置文件

@@ -1,9 +1,12 @@
 package com.sky.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersDTO;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
@@ -11,6 +14,7 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.AddressBookService;
 import com.sky.service.OrderService;
@@ -137,5 +141,31 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+    }
+
+    @Override
+    public PageResult page(Integer page, Integer pageSize,Integer status) {
+        PageHelper.startPage(page,pageSize);
+        OrdersPageQueryDTO ordersPageQueryDTO=new OrdersPageQueryDTO();
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        ordersPageQueryDTO.setStatus(status);
+
+        Page<Orders> pageQuery=orderMapper.pageQuery(ordersPageQueryDTO);
+        List<OrderVO> list=new ArrayList<>();
+        if(pageQuery!=null && pageQuery.size()>0){
+            for(Orders orders:pageQuery){
+//                获取订单id 查询订单信息
+                Long id=orders.getId();
+                List<OrderDetail> orderDetails = orderDetailMapper.getById(id);
+                OrderVO orderVO=new OrderVO();
+//               OrderVo是Orders的子类 所以可以属性拷贝父类中的属性
+                BeanUtils.copyProperties(orders,orderVO);
+                orderVO.setOrderDetailList(orderDetails);
+                list.add(orderVO);
+            }
+        }
+
+        return new PageResult(pageQuery.getTotal(),list);
+
     }
 }

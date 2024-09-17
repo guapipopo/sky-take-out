@@ -168,4 +168,18 @@ public class OrderServiceImpl implements OrderService {
         return new PageResult(pageQuery.getTotal(),list);
 
     }
+
+    @Override
+    public OrderVO details(Long id) {
+//        根据id查询订单
+        Orders order=orderMapper.getById(id);
+//        根据订单id查询订单详情
+        List<OrderDetail> orderDetails = orderDetailMapper.getById(id);
+//        封装给OrderVo并返回
+        OrderVO orderVO=new OrderVO();
+//        之所以可以copy是因为oderVo是Order的子类
+        BeanUtils.copyProperties(order,orderVO);
+        orderVO.setOrderDetailList(orderDetails);
+        return orderVO;
+    }
 }

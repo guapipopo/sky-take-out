@@ -23,6 +23,18 @@ public interface OrderService {
      * @param outTradeNo
      */
     void paySuccess(String outTradeNo);
-
+    /**
+     *  历史订单查询
+     * @param page
+     * @param pageSize
+     * @param status
+     * @return
+     */
     PageResult page(Integer page, Integer pageSize,Integer status);
+    /**
+     *  订单详情查询
+     * @param id
+     * @return
+     */
+    OrderVO details(Long id);
 }

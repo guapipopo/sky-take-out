@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService{
@@ -220,5 +221,23 @@ public class OrderServiceImpl implements OrderService{
         orders.setCancelTime(LocalDateTime.now());
         orderMapper.update(orders);
 
+    }
+
+    @Override
+    public void repetition(Long id) {
+        Long userId = BaseContext.getCurrentId();
+//       根据订单id 查询订单信息
+        List<OrderDetail> orderDetails = orderDetailMapper.getById(id);
+//       把OrderDetail转换成ShoppingCart
+        List<ShoppingCart> shoppingCarts=orderDetails.stream().map(item -> {
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(item, shoppingCart);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+//            订单详情里没有userId ，所以要手动设置
+            shoppingCart.setUserId(userId);
+            return shoppingCart;
+        }).collect(Collectors.toList());
+
+        shoppingCartMapper.insertBatch(shoppingCarts);
     }
 }

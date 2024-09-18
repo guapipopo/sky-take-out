@@ -9,6 +9,6 @@ import java.util.List;
 @Mapper
 public interface OrderDetailMapper {
     void insertBatch(List<OrderDetail> orderDetail);
-@Select("select * from order_detail where id = #{id}")
+@Select("select * from order_detail where order_id = #{id}")
     List<OrderDetail> getById(Long id);
 }

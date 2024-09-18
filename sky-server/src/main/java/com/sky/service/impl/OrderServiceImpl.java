@@ -21,6 +21,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService{
     @Autowired
     private ShoppingCartMapper shoppingCartMapper;
@@ -117,7 +119,6 @@ public class OrderServiceImpl implements OrderService{
 
         OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
         vo.setPackageStr(jsonObject.getString("package"));
-
         return vo;
     }
 
@@ -270,4 +271,37 @@ public class OrderServiceImpl implements OrderService{
 
         orderMapper.update(orders);
     }
+
+    @Override
+    public void rejection(OrdersRejectionDTO ordersConfirmDTO) throws Exception{
+        Orders ordersDB = orderMapper.getById(ordersConfirmDTO.getId());
+//        自己写的时候把他的反当成范围里了
+        // 订单只有存在且状态为2（待接单）才可以拒单
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+////            如果订单已付款需要退款
+//            if(ordersDB.getPayStatus().equals(Orders.PAID)){
+////            用户已支付，需要退款
+//                String refund = weChatPayUtil.refund(
+//                        ordersDB.getNumber(),
+//                        ordersDB.getNumber(),
+//                        new BigDecimal(0.01),
+//                        new BigDecimal(0.01));
+//                log.info("申请退款：{}", refund);
+//            }
+            if(ordersConfirmDTO.getRejectionReason()!=null){
+//                修改订单状态
+                Orders orders = Orders.builder()
+                        .id(ordersConfirmDTO.getId())
+                        .status(Orders.CANCELLED)
+                        .rejectionReason(ordersConfirmDTO.getRejectionReason())
+                        .cancelTime(LocalDateTime.now())
+                        .build();
+                orderMapper.update(orders);
+            }
+        }
+
+
 }

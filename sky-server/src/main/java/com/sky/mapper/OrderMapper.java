@@ -31,4 +31,6 @@ public interface OrderMapper {
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
 @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
+@Select("select count(id) from orders where status=#{toBeConfirmed}")
+    Integer countStatus(Integer toBeConfirmed);
 }
